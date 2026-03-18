@@ -1,8 +1,8 @@
-# The WHAM Architecture: Building Better with MVC's Static and Dynamic Parts
+# The WHAM Architecture: Building Better Compositions with Static and Dynamic Parts
 
-This document defines **WHAM** as a *code-structuring meta-architecture* for humans and machine agents to use as they codify their cognitive creations.
+This document defines **WHAM** as a *code-structuring meta-architecture* for humans and machine agents.
 
-WHAM decomposes MVC into **static and dynamic parts**, adds explicit composition points, and enforces a clean separation between:
+WHAM decomposes classic MVC and similar architectures into **static and dynamic parts**, adds explicit composition points, and enforces a clean separation between:
 - state,
 - intent,
 - pure logic,
@@ -12,32 +12,29 @@ WHAM decomposes MVC into **static and dynamic parts**, adds explicit composition
 The goal is **composability, testability, replayability, and clarity**.
 
 ---
-
 ## 0. Core Components
+State itself has Static and Dynamic parts:
+- Static Instructions: defined contracts, policies, protocols, guidelines, and code (what you're reading right now)
+- Dynamic Instances: the active compositions of those instructions at and in a runtime (the actual running system)
 
-WHAM uses the following canonical components:
+With that in mind WHAM uses the following canonical components to structure both the static and dynamic aspects of a system:
 
-| Component  | Role |
-|-----------|------|
-| **WINDOW** | Static Models |
-| **ADAPTER** | Dynamic Models |
-| **IDENTITY** | Dynamic State |
-| **INTENT** | Dynamic Views |
-| **INTERFACE** | Static Views |
-| **ACTION** | Static Control |
-| **MANAGER** | Dynamic Control |
-| **Instructions** | Static State (this guide & contracts) |
+ | Component        | Role            |
+ |------------------|-----------------|
+W| **WRAPPER**      | Static Models   | (aka FRAME, SURFACE, HOST)
+A| **ADAPTER**      | Dynamic Models  |
+I| **IDENTITY**     | Static Identity |
+I| **INSTANCE**     | Dynamic Identity|
+I| **INTENT**       | Dynamic Views   |
+I| **INTERFACE**    | Static Views    |
+∀| **ACTION**       | Static Control  |
+M| **MANAGER**      | Dynamic Control |
 
-The instructions as structured are the Static State. So with that you have complete mental modal for structuring your 
-State - the values you want to keep
-Models - the ways you want to relate those values to eachother
-Views - the ways values are presented, interpreted, and afforded
-Controllers - the ways you want to control how the values change
 ---
 
 ## 1. Canonical Meanings
 
-### WINDOW — Static Models
+### WRAPPER — Static Models
 Declared context frames:
 - Screens
 - Panels
@@ -45,9 +42,9 @@ Declared context frames:
 - Endpoint definitions
 - DOM roots
 
-**WINDOWS host interaction surfaces but do not contain business logic.**
+**WRAPPERS host interaction surfaces but do not contain business logic.**
 
-They render from Identity snapshots and expose event slots.
+They render from Instance snapshots and expose event slots.
 
 ---
 
@@ -55,7 +52,7 @@ They render from Identity snapshots and expose event slots.
 Adapters convert **raw events + runtime context** into **INTENT**.
 
 **Responsibilities**
-- Read window-local inputs (forms, selections)
+- Read wrapper-local inputs (forms, selections)
 - Read identity references (entityId, revisionId)
 - Normalize raw events into a stable Intent
 
@@ -66,22 +63,46 @@ Adapters convert **raw events + runtime context** into **INTENT**.
 
 ---
 
-### IDENTITY — Dynamic State
-Identity is the **single source of truth** for state.
+### IDENTITY — Static Identity
+Identity is the **stable reference** that names and addresses state.
 
-Recommended structure:
-- `entityId` (stable)
-- `revisionId` (version/hash)
-- immutable state snapshot
+An Identity is:
+- `entityId` — a stable, immutable key (string, URI, composite key)
+- `schema` — the shape contract for the state it names
+- `versioning policy` — how revisions are tracked (hash, counter, timestamp)
+
+**Identity defines *what* state is and how to find it. It does not hold live values.**
+
+Identity enables:
+- stable addressing across contexts
+- schema enforcement
+- lookup and resolution
+
+---
+
+### INSTANCE — Dynamic Identity
+Instance is the **materialized state** that an Identity points to in a given runtime context.
+
+An Instance holds:
+- `identityRef` — back-reference to the Identity it materializes
+- `revisionId` — the current version/hash
+- `state` — the live value snapshot
 
 **All mutable state lives here.**
 
-Identity enables:
+Multiple Instances of the same Identity may coexist:
+- the committed head
+- an optimistic branch (during async workflows)
+- a stale cache (in another wrapper)
+- an undo stack entry
+
+Instance enables:
 - versioning
 - replay
 - undo/redo
 - optimistic concurrency
 - auditability
+- branching and merging of state
 
 ---
 
@@ -94,7 +115,7 @@ Intent is a normalized description of *meaning*:
 - `capability`
 - `identityRef`
 - `payload`
-- `windowCtx`
+- `wrapperCtx`
 - `meta`
 
 **INTENTS are loggable, replayable, testable artifacts.**
@@ -138,7 +159,7 @@ The Manager is the runtime composer.
 It has four internal responsibilities:
 
 #### Binder
-- Window events → Adapters
+- Wrapper events → Adapters
 - Adapters → Manager dispatch
 
 #### Router
@@ -173,7 +194,7 @@ These contracts must hold everywhere:
 ## 3. Canonical Flow
 
 ### Composition Time (Binding)
-WINDOW.eventSlot → ADAPTER
+WRAPPER.eventSlot → ADAPTER
 INTENT → INTERFACE (via Manager routing)
 INTERFACE → ACTION delegates
 EFFECTS → effect handlers
@@ -193,19 +214,20 @@ Action
 ↓
 { delta, effects }
 ↓
-Manager.commit(delta)
+Manager.commit(delta) → Instance(identity)
 Manager.runEffects(effects)
 ↓
-Window.render(identitySnapshot)
+Wrapper.render(instance)
 
 ---
 
 ## 4. Folder Structure
 
 A default layout for humans and agents:
-/windows        # Static Models
+/wrappers        # Static Models
 /adapters       # Dynamic Models
-/identity       # State store + versioning
+/identity       # State addressing + schema
+/instances      # Live state + versioning
 /intents        # Intent schemas
 /interfaces     # Capability maps
 /actions        # Pure logic
@@ -224,7 +246,7 @@ A default layout for humans and agents:
     capability,
     identityRef?,
     payload,
-    windowCtx,
+    wrapperCtx,
     meta
 }
 
@@ -241,9 +263,17 @@ A default layout for humans and agents:
     }
 }
 
+### Instance
+{
+    identityRef,
+    revisionId,
+    state
+}
+
 ### Manager
 dispatch(intent)
-bind(window)
+bind(wrapper)
+commit(delta) → Instance
 runEffects(effects)
 
 ---
@@ -275,15 +305,17 @@ Store Intents or resulting events to:
 - Is code in the correct layer?
 - Are Actions pure?
 - Are effects declared, not executed?
-- Is state only in Identity?
+- Is mutable state only in Instance?
+- Is Identity just a stable reference (no live values)?
 - Is routing centralized in Manager?
 - Are Interfaces capability maps?
 
 ### “Where does this code go?”
-- Renders UI / declares structure → **Window**
+- Renders UI / declares structure → **Wrapper**
 - Bundles inputs → **Adapter**
 - Describes meaning → **Intent**
-- Stores state → **Identity**
+- Names/addresses state → **Identity**
+- Holds live state → **Instance**
 - Defines affordances → **Interface**
 - Transforms state → **Action**
 - Wires everything → **Manager**
@@ -293,15 +325,16 @@ Store Intents or resulting events to:
 ## 8. Rules for Machine Agents
 
 ### Constraints
-1. Never mutate state outside Identity
+1. Never mutate state outside Instance
 2. Never perform IO outside Effects
-3. Always introduce:
+3. Identity is immutable — only Instance holds live state
+4. Always introduce:
    - Intent
    - Action
    - Interface mapping
    - Adapter
    - Manager routing
-4. Prefer **new capabilities** over conditionals
+5. Prefer **new capabilities** over conditionals
 
 ### Test Generation
 - Unit tests for Actions
@@ -314,14 +347,14 @@ Store Intents or resulting events to:
 ## 9. ASCII Diagram
 
 ### Binding
-WINDOW → ADAPTER → MANAGER → INTERFACE → ACTION
+WRAPPER → ADAPTER → MANAGER → INTERFACE → ACTION
 
 ### Runtime
 Event → Adapter → Intent → Manager → Action → {Δ, Fx}
-↓              ↓
-Identity.commit   EffectRunner
+↓                ↓
+Instance.commit    EffectRunner
 ↓
-Window.render
+Wrapper.render(instance)
 
 ---
 
@@ -332,7 +365,7 @@ Window.render
 3. State changes are **values**, not mutations
 4. Effects are **declared**, not executed
 5. Composition is **runtime responsibility**
-6. Identity is **versioned**, not overwritten
+6. Identity is **stable** — Instance is **versioned**, not overwritten
 
 ---
 
