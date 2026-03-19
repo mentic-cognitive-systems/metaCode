@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>WHAM Pattern Card</title>
+  <style>
+    :root {
+      --bg: #0b0e14;
+      --card: #111827;
+      --muted: #9ca3af;
+      --text: #e5e7eb;
+      --accent: #60a5fa;
+      --accent2: #34d399;
+      --warn: #f59e0b;
+      --bad: #f87171;
+      --ok: #4ade80;
+      --border: #1f2937;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+    }
+    body {
+      margin: 0;
+      font-family: var(--sans);
+      background: radial-gradient(1200px 800px at 20% 10%, #0f172a 0%, var(--bg) 60%);
+      color: var(--text);
+      line-height: 1.35;
+    }
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 28px 16px 48px;
+    }
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px 18px;
+      align-items: baseline;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 14px;
+      margin-bottom: 18px;
+    }
+    h1 {
+      font-size: 22px;
+      margin: 0;
+      letter-spacing: 0.2px;
+    }
+    .subtitle {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 6px;
+    }
+    .pill {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      background: rgba(96,165,250,0.12);
+      border: 1px solid rgba(96,165,250,0.35);
+      color: var(--text);
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 14px;
+    }
+    @media (max-width: 920px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+    .card {
+      background: rgba(17,24,39,0.85);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 14px 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    }
+    .card h2 {
+      font-size: 14px;
+      margin: 0 0 10px;
+      color: #f3f4f6;
+      letter-spacing: 0.2px;
+    }
+    .small {
+      color: var(--muted);
+      font-size: 12px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+    th, td {
+      font-size: 12px;
+      padding: 10px 10px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+    th {
+      text-align: left;
+      color: #cbd5e1;
+      background: rgba(15,23,42,0.55);
+    }
+    tr:last-child td { border-bottom: none; }
+    code, pre {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: #e2e8f0;
+    }
+    pre {
+      margin: 10px 0 0;
+      padding: 10px 12px;
+      background: rgba(15,23,42,0.6);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: auto;
+      white-space: pre;
+    }
+    .kpi {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .kpi > div {
+      background: rgba(15,23,42,0.55);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px;
+    }
+    .kpi b { color: #f8fafc; }
+    .list {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--text);
+      font-size: 12px;
+    }
+    .list li { margin: 6px 0; }
+    .tag {
+      display: inline-block;
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      margin-right: 6px;
+      background: rgba(15,23,42,0.55);
+      color: #cbd5e1;
+    }
+    .tag.ok { border-color: rgba(74,222,128,0.5); background: rgba(74,222,128,0.12); color: #dcfce7; }
+    .tag.warn { border-color: rgba(245,158,11,0.5); background: rgba(245,158,11,0.12); color: #ffedd5; }
+    .tag.bad { border-color: rgba(248,113,113,0.5); background: rgba(248,113,113,0.12); color: #fee2e2; }
+    .muted { color: var(--muted); }
+    .cols2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 920px) {
+      .cols2 { grid-template-columns: 1fr; }
+    }
+    .foot {
+      margin-top: 14px;
+      border-top: 1px solid var(--border);
+      padding-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .mono {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: #cbd5e1;
+    }
+    .rules li b { color: #f8fafc; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>The WHAM Architecture: Building Better with MVC's Static and Dynamic Parts</h1>
+        <div class="subtitle">Pattern Card — a practical, enforceable code-structuring meta-architecture for humans and machine agents.</div>
+      </div>
+      <div class="pill">
+        <span style="color:var(--accent2);font-weight:600">Core idea:</span>
+        <span>Static definitions + dynamic composition + pure transforms + declared effects</span>
+      </div>
+    </header>
+
+    <div class="grid">
+      <!-- LEFT -->
+      <section class="card">
+        <h2>1) Vocabulary (Canon)</h2>
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 18%">Component</th>
+              <th style="width: 22%">WHAM Role</th>
+              <th>What it is (practical)</th>
+              <th style="width: 28%">Must / Must Not</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><b>WINDOW</b></td>
+              <td>Static Models</td>
+              <td>Declared context frames: screens/routes/panels/endpoints/DOM roots. Hosts event slots and renders from Identity snapshots.</td>
+              <td>
+                <span class="tag ok">Must</span> declare structure, render from state<br/>
+                <span class="tag bad">Must not</span> contain business logic or mutate state
+              </td>
+            </tr>
+            <tr>
+              <td><b>ADAPTER</b></td>
+              <td>Dynamic Models</td>
+              <td>Event adapter/handler that bundles runtime context (Window + event + Identity ref) into an Intent.</td>
+              <td>
+                <span class="tag ok">Must</span> produce <b>Intent</b><br/>
+                <span class="tag bad">Must not</span> do IO or commit state
+              </td>
+            </tr>
+            <tr>
+              <td><b>IDENTITY</b></td>
+              <td>Dynamic State</td>
+              <td>Single source of truth for state. Versioned by entityId + revisionId. Commits deltas → new revision.</td>
+              <td>
+                <span class="tag ok">Must</span> own state + versioning<br/>
+                <span class="tag bad">Must not</span> know UI or routing
+              </td>
+            </tr>
+            <tr>
+              <td><b>INTENT</b></td>
+              <td>Dynamic Views</td>
+              <td>Normalized “meaning” of an interaction: kind + capability + identityRef + payload + windowCtx + meta. Loggable/replayable.</td>
+              <td>
+                <span class="tag ok">Must</span> be stable/testable<br/>
+                <span class="tag bad">Must not</span> contain executable logic
+              </td>
+            </tr>
+            <tr>
+              <td><b>INTERFACE</b></td>
+              <td>Static Views</td>
+              <td>Static capability map: <span class="mono">capability → Action delegate/pipeline</span>. Defines affordances/policy surfaces.</td>
+              <td>
+                <span class="tag ok">Must</span> be delegate map (data)<br/>
+                <span class="tag bad">Must not</span> hold state or route
+              </td>
+            </tr>
+            <tr>
+              <td><b>ACTION</b></td>
+              <td>Static Control</td>
+              <td>Pure transform: <span class="mono">(state, intent) → {delta, effects}</span>. Deterministic. Composable pipelines.</td>
+              <td>
+                <span class="tag ok">Must</span> be pure + return effects<br/>
+                <span class="tag bad">Must not</span> perform IO
+              </td>
+            </tr>
+            <tr>
+              <td><b>MANAGER</b></td>
+              <td>Dynamic Control</td>
+              <td>Runtime composer: Binder + Router + Workflow + Effect Runner. Binds events, routes intents, commits deltas, runs effects.</td>
+              <td>
+                <span class="tag ok">Must</span> be only committer/effect runner<br/>
+                <span class="tag warn">Should</span> be split internally to avoid “god object”
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="kpi">
+          <div>
+            <b>Non-negotiable contract #1</b>
+            <div class="small">Adapter always returns an Intent (no IO, no mutation).</div>
+          </div>
+          <div>
+            <b>Non-negotiable contract #2</b>
+            <div class="small">Action always returns <span class="mono">{ delta, effects[] }</span> (pure).</div>
+          </div>
+          <div>
+            <b>Non-negotiable contract #3</b>
+            <div class="small">Only Manager commits Identity + runs effects.</div>
+          </div>
+          <div>
+            <b>Non-negotiable contract #4</b>
+            <div class="small">Interface is a capability map (delegate data), not just a type annotation.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT -->
+      <aside class="card">
+        <h2>2) Canonical Flow</h2>
+        <div class="small muted">Separate composition-time wiring from runtime execution.</div>
+        <pre>
+COMPOSITION (binding)
+Manager binds:
+  Window.eventSlot → Adapter
+Manager routes:
+  Intent → Interface → Action delegate
+
+RUNTIME (execution)
+Event → Adapter → Intent → Manager.route()
+  → Interface.delegate → Action(state,intent)
+  → {Δ, Fx} → Manager.commit(Δ)
+  → Manager.runEffects(Fx)
+  → Window.render(identitySnapshot)</pre>
+
+        <h2 style="margin-top:14px">3) Folder Layout (Default)</h2>
+        <pre>
+/windows      (WINDOW: static models)
+/adapters     (ADAPTER: dynamic models)
+/identity     (IDENTITY: state + versioning)
+/intents      (INTENT: schemas/helpers)
+/interfaces   (INTERFACE: capability maps)
+/actions      (ACTION: pure transforms)
+/manager      (MANAGER: bind/route/workflow)
+/effects      (effect executors)
+/kinds        (policy + affordances)
+/tests</pre>
+
+        <h2 style="margin-top:14px">4) Quick Placement Rules</h2>
+        <ul class="list rules">
+          <li><b>Renders or declares structure</b> → Window</li>
+          <li><b>Bundles event + context into meaning</b> → Adapter → Intent</li>
+          <li><b>Stores/version state</b> → Identity</li>
+          <li><b>Defines affordances as delegate map</b> → Interface</li>
+          <li><b>Pure state transform</b> → Action</li>
+          <li><b>Wires, routes, commits, runs effects</b> → Manager</li>
+        </ul>
+
+        <h2 style="margin-top:14px">5) Mental Shifts</h2>
+        <ul class="list">
+          <li>Events don’t “do work” — they produce <b>Intent</b>.</li>
+          <li>Interfaces are <b>data</b> (capability maps), not just types.</li>
+          <li>State updates are <b>values</b> (Δ), not mutations.</li>
+          <li>Effects are <b>declared</b> in Actions and executed by Manager.</li>
+          <li>Composition is a runtime responsibility (Manager), not scattered glue.</li>
+          <li>Identity is <b>versioned</b> (entityId + revisionId), enabling replay/audit.</li>
+        </ul>
+
+        <div class="foot">
+          <div>Use this card as “static state” for PR review + agent enforcement.</div>
+          <div class="mono">WHAM: Window · Adapter · Identity · Intent · Interface · Action · Manager</div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</body>
+</html>
