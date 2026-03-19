@@ -66,7 +66,12 @@ For each: handler location and the downstream components it invokes.
 - Enumerate all physical data boundaries (SQLite, file system blobs, config files, caches).
 - For each: location on disk, schema/format, which components own read/write operations, and volatility (cache vs persistent).
 
-10) Architectural Guardrails & Workflows
+10) Extensibility & Plugins Map
+- Clearly separate the "core" system from "additive" plugins/extensions.
+- Detail how the code lends itself to extensibility (e.g., Plugin SDK, component interfaces, hooks).
+- Enumerate the categories of existing extensions (e.g., channels, auth, features) without needing to concern with their internal shape.
+
+11) Architectural Guardrails & Workflows
 - Summarize developer testing flows (e.g., test framework, commands to run).
 - Document strict repository conventions and "anti-patterns" to avoid (e.g., package boundary crossing, static vs dynamic import rules).
 
@@ -80,7 +85,8 @@ Output files in codemaps directory:
 07-signature-index.md
 08-state-and-persistence.md
 09-guardrails-and-workflows.md
-10-task-specific-map.md (optional context for specific task)
+10-extensibility-and-plugins.md
+11-task-specific-map.md (optional context for specific task)
 
 Output format:
 - Use Markdown headings.
