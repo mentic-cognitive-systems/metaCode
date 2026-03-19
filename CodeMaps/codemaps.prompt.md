@@ -1,8 +1,11 @@
 You are our codebase cartographer. Help us build a “navigation map” for this repository which will be used by cognitive agents (organic or synthetic) to understand the code for support and development to enable recursive self improvement. 
 The goal is to create a set of maps that balance breadth and depth, providing enough detail to be actionable without overwhelming them with information. 
-We want to keep our cogntive context clear for easy reference and recomposition.
+We want to keep our cognitive context clear for easy reference and recomposition.
 
 Files may already exist in the /codemaps directory that describe the codebase. If so, look at when they were last modified and check the Git logs from then forward to make sure they're up to date and accurately reflect the changes made since then and now.
+
+**Traverse Like a Tree (Embeddedness & Composition)**: 
+Start your analysis at the main entry points (the roots). Trace the execution graph downwards into the core runtime loop (the trunk), out into the major components (thick branches), and finally to the decoupled plugins and public interfaces (leaves/canopy). Avoid cyclic reference loops by focusing on structural composition and bounded contexts. Distinguish clearly between the tightly coupled structural core and the loosely coupled additive extensions.
 
 Goals:
 - Make it easy for an agent to find: entry points, runtime services, major components, and public APIs.
@@ -18,79 +21,63 @@ Repo context:
 
 Deliverables (in this order):
 
-1) Existing docs inventory
-- List architecture/runbook/onboarding docs you find (README, /docs, ADRs).
-- Summarize what each doc explains + missing gaps.
+1) Existing docs inventory & C4-style overview (The Legend)
+- Skim README and docs.
+- Provide a C4 overview (C1: users/systems, C2: containers).
+- For each container: entry file(s), how it's launched, ports, and key config.
 
-2) C4-style overview (text + optional mermaid)
-- C1: users + external systems
-- C2: containers/services/apps + datastores + message buses
-For each container: entry point file(s), how it’s launched, ports, key env/config.
+2) Entry-point map (The Roots)
+- Find where execution originates: CLI commands, server bootstraps, background workers, scheduled jobs, test harnesses.
+- For each: show the call path down to the first domain-layer action.
 
-3) Runtime topology
-- What processes run (API, workers, schedulers), how they communicate (HTTP/queues/db), and where health/metrics/logging are wired.
-- Explicitly map out Dependency Injection containers, middleware chains, and lifecycle hooks so execution traces are clear.
+3) Runtime topology (The Trunk)
+- What primary processes run (API, workers, schedulers) and how they communicate.
+- Explicitly map out Dependency Injection containers, middleware chains, and lifecycle hooks so execution traces from the root are clear.
 
-4) Entry-point map
-- Enumerate all “entry points”:
-  - CLI commands
-  - server bootstraps
-  - background workers
-  - scheduled jobs
-  - test harnesses
-For each: show the call path (top 5–15 frames / functions) down to the first domain-layer action.
+4) Component map (The Thick Branches)
+- Break the core application into its massive, structural domain-layer modules.
+- For each core component: responsibilities, key types, and what sub-components it invokes.
 
-5) Public surface map
-- HTTP routes / GraphQL / RPC
-- Message/event types
-- Library exports / plugin interfaces
-For each: handler location and the downstream components it invokes.
-
-6) Component map (per service)
-- Break each service into 5–12 major components/modules.
-- Emphasize extension and plugin architectures, including how they are discovered, registered, and loaded.
-- For each: responsibilities, key types, and dependencies (what it calls).
-
-7) Domain model (only core)
-- Identify core entities/value objects/events.
-- Show the main workflows/state transitions and where they’re implemented.
-
-8) Focused signature index (NOT exhaustive)
-- For the top 20 most central types in the core workflow:
-  - name, purpose
-  - key methods/properties
-  - references: “used by” and “depends on”
-  - file path
-
-9) State & Persistence Map
+5) State & Persistence Map (The Soil/Data)
 - Enumerate all physical data boundaries (SQLite, file system blobs, config files, caches).
-- For each: location on disk, schema/format, which components own read/write operations, and volatility (cache vs persistent).
+- For each: location on disk, schema/format, which branches own read/write operations, and volatility.
 
-10) Extensibility & Plugins Map
-- Clearly separate the "core" system from "additive" plugins/extensions.
-- Detail how the code lends itself to extensibility (e.g., Plugin SDK, component interfaces, hooks).
-- Enumerate the categories of existing extensions (e.g., channels, auth, features) without needing to concern with their internal shape.
+6) Domain model (The Sap)
+- Identify core entities/value objects/events.
+- Show the main workflows/state transitions and where they run through the tree.
 
-11) Architectural Guardrails & Workflows
-- Summarize developer testing flows (e.g., test framework, commands to run).
-- Document strict repository conventions and "anti-patterns" to avoid (e.g., package boundary crossing, static vs dynamic import rules).
+7) Extensibility & Plugins Map (The Thin Branches)
+- Clearly separate the strictly structural "core" from completely decoupled/additive extensions.
+- Detail how interfaces attach to the thick branches (e.g., Plugin SDK, component interfaces, hooks).
+- Enumerate existing extension categories (e.g., channels, auth, features) without dissecting their internal shapes.
+
+8) Public surface map (The Canopy)
+- What this tree exposes to the outside world (HTTP routes, GraphQL/RPC, message/event types, exported interfaces).
+- For each: handler location and the immediate internal component it invokes.
+
+9) Focused signature index (The Cellular Level)
+- For the top 20 most central/critical types: name, purpose, key methods, references ("used by", "depends on"), and stable file path.
+
+10) Architectural Guardrails & Workflows (The Laws of Physics)
+- Summarize developer testing flows (test framework, commands to run).
+- Document absolute structural constraints and "anti-patterns" to prevent the tree from breaking (e.g., boundary crossing, static vs dynamic import rules).
 
 Output files in codemaps directory:
 01-architecture.md
-02-runtime-topology.md
-03-entry-points.md
-04-public-surface.md
-05-components.md
+02-entry-points.md
+03-runtime-topology.md
+04-components.md
+05-state-and-persistence.md
 06-domain-model.md
-07-signature-index.md
-08-state-and-persistence.md
-09-guardrails-and-workflows.md
-10-extensibility-and-plugins.md
+07-extensibility-and-plugins.md
+08-public-surface.md
+09-signature-index.md
+10-guardrails-and-workflows.md
 11-task-specific-map.md (optional context for specific task)
 
 Output format:
 - Use Markdown headings.
-- Include mermaid diagrams when helpful (C2 container graph and a couple key flows).
+- Include mermaid diagrams when helpful.
 - Use stable, clickable file paths.
 - End with: “If I want to change X, start at …” pointers for my task.
 - Timebox yourself per layer and stop expanding when repetition begins.
